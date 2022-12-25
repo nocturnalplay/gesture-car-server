@@ -34,24 +34,37 @@ async def hello(uri):
                     control = json.loads(await websocket.recv())
                     print(control)
                     if control:
-                        if "direction" in control.keys():
-                            if "rospeed" in control.keys():
-                                star.start(control['rospeed'])
-                                if control['direction'] == "right":
-                                    GPIO.output(13, 0)
-                                    GPIO.output(19, 1)
-                                elif control['direction'] == "left":
-                                    GPIO.output(13, 1)
-                                    GPIO.output(19, 0)
+                        if "acdirection" in control.keys():
                             if "acspeed" in control.keys():
                                 acc.start(control['acspeed'])
-                                if control['direction'] == "forward":
+                                if control['acdirection'] == "forward":
                                     GPIO.output(5, 1)
                                     GPIO.output(6, 0)
-                                elif control['direction'] == "backward":
+                                elif control['acdirection'] == "backward":
                                     GPIO.output(5, 0)
                                     GPIO.output(6, 1)
-
+                                elif control['acdirection'] == "neutral":
+                                    GPIO.output(5, 0)
+                                    GPIO.output(6, 0)
+                        if "rodirection" in control.keys():
+                            if "rospeed" in control.keys():
+                                star.start(control['rospeed'])
+                                if control['rodirection'] == "right":
+                                    GPIO.output(13, 1)
+                                    GPIO.output(19, 0)
+                                elif control['rodirection'] == "left":
+                                    GPIO.output(13, 0)
+                                    GPIO.output(19, 1)
+                                elif control['rodirection'] == "neutral":
+                                    GPIO.output(13, 0)
+                                    GPIO.output(19, 0)
+                    else:
+                        GPIO.output(13, 0)
+                        GPIO.output(19, 0)
+                        GPIO.output(5, 0)
+                        GPIO.output(6, 0)
+                        star.start(0)
+                        acc.start(0)
             except KeyboardInterrupt:
                 GPIO.cleanup()
                 # end the PWM
